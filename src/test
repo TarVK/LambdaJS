@@ -1,0 +1,101 @@
+# 1 initial syntax idea
+
+type Nat = Z | S prev;
+
+add Z x = x;
+add (S x) y = S (add x y);
+
+export add S(Z) Z; 
+
+~-> 
+
+const add = x=>y=>x(v=>S=>Z=>S(add(v)(y)))(y);
+
+const zero = S=>Z=>Z;
+const succ = v=>S=>Z=>S(v); 
+const result = (add)(succ(zero))(zero);
+
+const convert = v=>v(n=>{succ: convert(n)})({zero: undefined});
+
+# 2 mutual recursion
+type Nat = Z | S Nat;
+type Bool = False | True;
+
+isOdd Z = False;
+isOdd (S x) = isEven x;
+
+isEven Z = True;
+isEven (S x) = isOdd x;
+
+~->
+Zero = _=>z=>s=>z(_)
+Succ = _=>p=>z=>s=>s(_)(_=>p(_))
+
+True = _=>x=>y=>x(_)
+False = _=>x=>y=>y(_)
+
+Pair = _=>f=>s=>g=>g(_)(_=>f(_))(_=>s(_))
+first = _=>t=>t(_)(_=>f=>s=>f(_))
+second = _=>t=>t(_)(_=>f=>s=>s(_))
+
+Y = _=>f=>(x=>f(_)(_=>x(x)))(x=>f(_)(_=>x(x)))
+
+isOddIsEven = _=>Y(_)(_=>rec=>(
+	isOdd=>isEven=>Pair(_)(
+    	_ => x => x(_)(_=>False(_))(_=>p=>isEven(_)(_=>p(_)))
+    )(
+    	_ => x => x(_)(_=>True(_))(_=>p=>isOdd(_)(_=>p(_)))
+    )
+)(
+	_=>first(_)(_=>rec(_))
+)(
+	_=>second(_)(_=>rec(_))
+))
+isOdd = _=>first(_)(_=>isOddIsEven(_))
+isEven = _=>second(_)(_=>isOddIsEven(_))
+
+# 3 pattern matching
+Leaf val;
+Tree left right;
+
+Z;
+S prev;
+
+smth (Tree (left) (Z)) = Z;
+smth (Tree (left) (S x)) = S Z;
+smth (Leaf x) = Z;
+
+
+smth (Node left right) (S val) = 1;
+smth (Node (S left) right) val = 2;
+smth (Leaf val) (Node left right) = 3;
+smth (Leaf smth) val = 4;
+smth smth (Node left right) = 5;
+smth left (Leaf val) = 6;
+
+
+~->
+
+1: [[0], Node] -> [[0, 1], left] -> [[0,2] right] -> [[1], S] -> [[1, 1], val]
+2: [[0], Node] -> [[0, 1], S] -> [[0, 1, 1], left] -> [[0, 2], right] -> [[1], val]
+
+1: [0: Node] -> [1: left] -> [1: right] -> [0: S] -> [1: val]
+2: [0: Node] -> [1: S] -> [2: left] -> [1: right] -> [0: val]
+
+~->
+
+smth = p1 => match p {
+  Node left right: match left {
+    S m: two => match two {
+    	S v: 1
+    	default: 2
+    }
+    default: two => match two {
+    	S v: 1
+    	default: undefined
+    }
+  }
+} 
+
+	
+

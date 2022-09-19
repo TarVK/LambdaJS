@@ -1,0 +1,13 @@
+Some things I noticed about rascal:
+- No type/checking intellisense at compiletime
+- No syntax highlighting if grammar error (Quite annoying/difficult to discover that I can't used "start" as a variable for instance)
+- Poor syntax error text (expected symbol, etc)
+- `type: value` in terminal is a bit confusing
+- In eclipse: Sometimes instant save, sometimes build dialog
+- Visitor: top-down-break and bottom-up-break; Why not get this behavior more dynamically by using some sort of "break" statement?
+- No lambda expressions, or function parameter signatures? 
+- Is there tooling for source-maps, such as found in javascript? 
+- No inline if? (it behaves like it's inline, but isn't syntactically an expression)
+- What's the type of some syntax like `MySyntax*` and what operations does it have?
+- Can I pattern match an entire syntax rule, instead of destructuring it? E.g. (Constructor)`<varName>`
+- Weid behavior with replacements: https://puu.sh/Jm605/373f639d0d.png

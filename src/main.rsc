@@ -26,9 +26,12 @@ public list[SubstitutedMatchList] tes(Program program) {
 	list[SubstitutedMatchList] out = [];
 	list[Const] constructors = getConstructors(program);
 	visit (program) {
-		case (Declaration)`<Identifier name> <SimpleStructure* args> = <Expression body>;`: {
-			out += <createMatchList(constructors, 0, End(), [ss | SimpleStructure ss <- args]), (), body, false>;
+		case (Declaration)`<Function function>`: {
+			out += <createMatchList(constructors, function), (), false>;
 		}
+		//case (Declaration)`<Identifier name> <SimpleStructure* args> = <Expression body>;`: {
+		//	out += <createMatchList(constructors, 0, End(), [ss | SimpleStructure ss <- args]), (), body, false>;
+		//}
 	}
 	return out;
 } 
@@ -102,11 +105,32 @@ public str getLambda(Split(path, matchers, rest), str dent, list[Const] construc
  	} 
  	return out + "\n";
 }
+
+
+data Error = TooFewArguments(
+	Const constructor,
+	Structure structure
+) | TooManyArguments(
+	Const constructor,
+	Structure structure
+) | TooFewParameters(
+	list[Structure] longerAlts,
+	Structure structure
+);
+
+public str toStr(TooFewParameters(alts, structure)) = "tooFewParameters(alts: [<toStr(alts)[..-2]>], <structure>)";
+public str toStr(TooFewArguments(Const(_, _, const), structure)) = "tooFewArguments(Const: <const>, <structure>)";
+public str toStr(TooManyArguments(Const(_, _, const), structure)) = "tooManyArguments(Const: <const>, <structure>)";
+public str toStr([Structure first, *rest]) =  "<first>, " + toStr(rest);
+public str toStr([]) = "";
+public str toStr({Error first, *rest}) = toStr(first) + ",\n" + toStr(rest);
+public str toStr({}) = "";
 	
 public void test2(Program program) {
 	list[SubstitutedMatchList] matches = tes(program);	
 	list[Const] constructors = getConstructors(program);
-	MatchTree Split = createMatchTree(constructors, matches, [0], []);
-	println(getLambda(Split, "", constructors));
+	MTE (split, errors) = createMatchTree(constructors, matches);
+	println(getLambda(split, "", constructors));
+	println(toStr(errors));
 	//printLines(getLambda(Split, "", constructors));
 }

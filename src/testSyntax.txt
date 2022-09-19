@@ -1,8 +1,8 @@
 Leaf val;
 Tree left right;
 
-smth (Tree (Leaf val) right) (Leaf val2) = val; 
-smth (Tree left (Leaf val)) val2 = val2;  
-smth (Tree left right) val2 = left; 
-smth (Leaf (Leaf val)) = val; 
-smth (Leaf val) = val;
+smth (Tree (Leaf val) right) val2 = val;  
+smth (Tree left (Leaf val)) val2 = val2; 
+smth (Tree left right) = left; 
+smth (Leaf (Leaf val)) (Leaf val) = val; 
+smth (Leaf val) val2 = val;

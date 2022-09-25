@@ -11,3 +11,4 @@ Some things I noticed about rascal:
 - What's the type of some syntax like `MySyntax*` and what operations does it have?
 - Can I pattern match an entire syntax rule, instead of destructuring it? E.g. (Constructor)`<varName>`
 - Weid behavior with replacements: https://puu.sh/Jm605/373f639d0d.png
+- Transparency about runtime performance of functions, E.g. pattern matching iteration

@@ -5,10 +5,20 @@ import String;
 import Node;
 import ParseTree;
 import abstractData;
-import IO;
 import matchPattern;
+import collectDeclarations;
+import orderDeclarations;
+import asStr;
 
 public Program parse(str txt) = parse(#Program, txt);
+public void testProgram() {
+    Program program = parse(readFile(|file:///I:/projects/Github/LambdaJS/src/testSyntax.txt|));
+    if(<Declarations(constructors, functions), errors> := collectDeclarations(program)) {
+        FunctionOrder order = orderDeclarations(functions);
+        println(order);
+    }
+}
+
 
 public list[Const] getConstructors(Program program) {
 	list[Const] out = [];
@@ -129,8 +139,9 @@ public str toStr({}) = "";
 public void test2(Program program) {
 	list[SubstitutedMatchList] matches = tes(program);	
 	list[Const] constructors = getConstructors(program);
-	MTE (split, errors) = createMatchTree(constructors, matches);
-	println(getLambda(split, "", constructors));
-	println(toStr(errors));
+	if(<split, errors> := createMatchTree(constructors, matches)){
+    	println(getLambda(split, "", constructors));
+    	println(toStr(errors));
+	}
 	//printLines(getLambda(Split, "", constructors));
 }

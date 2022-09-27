@@ -14,8 +14,10 @@ public Program parse(str txt) = parse(#Program, txt);
 public void testProgram() {
     Program program = parse(readFile(|file:///I:/projects/Github/LambdaJS/src/testSyntax.txt|));
     if(<Declarations(constructors, functions), errors> := collectDeclarations(program)) {
-        FunctionOrder order = orderDeclarations(functions);
-        println(order);
+        if (<order, unknownErrors> := orderDeclarations(functions, constructors)) {
+            println(unknownErrors);
+            println(order);
+        }
     }
 }
 

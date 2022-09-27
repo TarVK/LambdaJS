@@ -9,4 +9,4 @@ smth (Tree (Leaf val) right) val2 = val;
 smth (Tree left (Leaf val)) val2 = val2; 
 smth (Tree left right) = left; 
 smth (Leaf (Leaf val)) (Leaf theBed) = doSmth val; 
-smth (Leaf val) val2 = Leaf val val2;
+smth (Leaf val) val2 = fuck val val2;

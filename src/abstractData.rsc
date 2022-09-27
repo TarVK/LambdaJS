@@ -26,6 +26,8 @@ public data Error = TooFewArguments(
 ) | DuplicateDecaration(
     Const constructor,
     Constructor duplicate
+) | UnknownFunction (
+    Identifier
 );
 
 public alias WithErrors[&U] = tuple[&U, Errors];

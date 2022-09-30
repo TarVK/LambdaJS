@@ -54,6 +54,78 @@ isOddIsEven = _=>Y(_)(_=>rec=>(
 isOdd = _=>first(_)(_=>isOddIsEven(_))
 isEven = _=>second(_)(_=>isOddIsEven(_))
 
+
+
+_ = _ => _
+$isTrue = b=>b(_)(_=>true)(_=>false)
+$isTrue(_=>isEven(_)(_=>Succ(_)(_=>Succ(_)(_=>Succ(_)(_=>Zero(_))))))
+~-> 
+
+D2 = _=>def1=>def2=>continuation=>(
+    funcs => continuation(_)(
+        _=>first(_)(funcs)
+    )(
+        _=>second(_)(funcs)
+    )
+)(
+    _=>Y(_)(_=>rec=>
+        (
+            rec1=>rec2=>Pair(_)(
+                _=>def1(_)(rec1)(rec2)
+            )(
+                _=>def2(_)(rec1)(rec2)
+            )
+        )(
+            _=>first(_)(rec)
+        )(
+            _=>second(_)(rec)
+        )
+    )
+)
+
+isEven = _=>D2(_)(
+    _=>isOdd=>isEven=> x => x(_)(_=>False(_))(_=>p=>isEven(_)(_=>p(_)))
+)(
+    _=>isOdd=>isEven=> x => x(_)(_=>True(_))(_=>p=>isOdd(_)(_=>p(_)))
+)(
+    _=>isOdd=>isEven=>isEven(_)
+)
+$isTrue(_=>isEven(_)(_=>Succ(_)(_=>Succ(_)(_=>Succ(_)(_=>Zero(_))))))
+
+~-> 
+
+D2 = _=>def1=>def2=>continuation=>(
+    funcs => continuation(_)(
+        _=>funcs(_)(first=>second=>first)
+    )(
+        _=>funcs(_)(first=>second=>second)
+    )
+)(
+    _=>Y(_)(_=>rec=>
+        (
+            rec1=>rec2=>get=>get(_)(
+                _=>def1(_)(rec1)(rec2)
+            )(
+                _=>def2(_)(rec1)(rec2)
+            )
+        )(
+            _=>rec(_)(first=>second=>first)
+        )(
+            _=>rec(_)(first=>second=>second)
+        )
+    )
+)
+
+isEven = _=>D2(_)(
+    _=>isOdd=>isEven=> x => x(_)(_=>False(_))(_=>p=>isEven(_)(_=>p(_)))
+)(
+    _=>isOdd=>isEven=> x => x(_)(_=>True(_))(_=>p=>isOdd(_)(_=>p(_)))
+)(
+    _=>isOdd=>isEven=>isEven(_)
+)
+$isTrue(_=>isEven(_)(_=>Succ(_)(_=>Succ(_)(_=>Succ(_)(_=>Zero(_))))))
+
+
 # 3 pattern matching
 Leaf val;
 Tree left right;

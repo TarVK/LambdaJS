@@ -1,10 +1,11 @@
 module abstractData
 import Lang;
+import util::Maybe;
 
 public data Const = Const(
     str name,
     int paramCount,
-    Constructor const
+    Maybe[Constructor] const
 );
 
 public data Declarations = Declarations(
@@ -31,3 +32,19 @@ public data Error = TooFewArguments(
 );
 
 public alias WithErrors[&U] = tuple[&U, Errors];
+
+
+
+public alias Substitution = map[str, list[int]];
+public alias OnHold = bool;
+public data MatchTree = Param(
+    list[int] paramPath,
+    MatchTree rest
+) | Split(
+    list[int] splitPath,
+    map[Const, MatchTree] matchers,
+    MatchTree rest
+) | ST(
+    Expression expression,
+    Substitution substitution
+) | Undefined();

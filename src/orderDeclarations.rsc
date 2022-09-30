@@ -118,7 +118,6 @@ public data FunctionGroup = FG(
 );
 
 public WithErrors[FunctionOrder] orderDeclarations(map[str, list[Function]] functions,  map[str, Const] constructors) {
-    // TODO: add error handling by detecting non-declared functions
     Dependencies d = dependencies(functions);
     StringDependencies sd = stringDependencies(d);
     list[set[str]] components = getSCC(sd);

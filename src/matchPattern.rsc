@@ -87,20 +87,7 @@ public Maybe[Const] findConstructor([Const first, *rest], str name) {
 public Maybe[Const] findConstructor([], str name) = nothing();
 
 // Create an abstract match tree 
-alias Substitution = map[str, list[int]];
-alias OnHold = bool;
 alias SubstitutedMatchList = tuple[MatchList, Substitution,  OnHold];
-data MatchTree = Param(
-    list[int] paramPath,
-    MatchTree rest
-) | Split(
-    list[int] splitPath,
-    map[Const, MatchTree] matchers,
-    MatchTree rest
-) | ST(
-    Expression expression,
-    Substitution substitution
-) | Undefined();
 
 
 public int getDepth(<Match(depth, _, _, _), _, _>) = depth;

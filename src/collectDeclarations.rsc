@@ -3,9 +3,10 @@ import abstractData;
 import Lang;
 import asStr;
 import List;
+import util::Maybe;
 
 public WithErrors[Declarations] collectDeclarations(Program program) {
-    map[str, Const] constructors = ();
+    map[str, Const] constructors = ("Undefined": Const("Undefined", 0, nothing()));
     map[str, list[Function]] functions = ();
     Errors errors = {};
     
@@ -16,7 +17,7 @@ public WithErrors[Declarations] collectDeclarations(Program program) {
                 str name = asStr(head(partsList));
                 
                 if (name in constructors) errors += DuplicateDecaration(constructors[name], const);   
-                else constructors += (name: Const(name, size(partsList)-1, const));
+                else constructors += (name: Const(name, size(partsList)-1, just(const)));
             }
         }
         case (Declaration)`<Function function>`: {

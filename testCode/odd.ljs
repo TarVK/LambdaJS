@@ -1,0 +1,13 @@
+Z;
+S nat;
+
+False;
+True;
+
+neg True = False;
+neg False = True;
+
+isOdd Z = False;
+isOdd (S x) = neg (isOdd x);
+
+output isOdd (S (S (S Z)));

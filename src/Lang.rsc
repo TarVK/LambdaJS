@@ -1,12 +1,12 @@
 module Lang
 
 layout Whitespace = [\t-\n\r\ ]*;
-lexical Identifier = [a-zA-Z][a-zA-Z0-9]* !>> [a-zA-Z0-9];
+lexical Identifier = ([a-zA-Z][a-zA-Z0-9]*) \ "output" !>> [a-zA-Z0-9];
 
 start syntax Program = Statement*;
 
 lexical StatementEnd = ";";
-syntax Statement =  Export
+syntax Statement =  Output
 				 > Declaration;
 
 syntax Declaration = Function
@@ -22,5 +22,5 @@ syntax SimpleExpression = Identifier
 						| bracket "(" Expression ")"; 
 syntax Expression = SimpleExpression+; 
 
-lexical ExportKeyword = "export";
-syntax Export = ExportKeyword Expression StatementEnd;
+lexical OutputKeyword = "output";
+syntax Output = OutputKeyword Expression StatementEnd;

@@ -51,6 +51,7 @@ isOddIsEven = _=>Y(_)(_=>rec=>(
 )(
 	_=>second(_)(_=>rec(_))
 ))
+
 isOdd = _=>first(_)(_=>isOddIsEven(_))
 isEven = _=>second(_)(_=>isOddIsEven(_))
 
@@ -96,9 +97,9 @@ $isTrue(_=>isEven(_)(_=>Succ(_)(_=>Succ(_)(_=>Succ(_)(_=>Zero(_))))))
 
 D2 = _=>def1=>def2=>continuation=>(
     funcs => continuation(_)(
-        _=>funcs(_)(first=>second=>first)
+        _=>funcs(_)(_=>first=>second=>first)
     )(
-        _=>funcs(_)(first=>second=>second)
+        _=>funcs(_)(_=>first=>second=>second)
     )
 )(
     _=>Y(_)(_=>rec=>
@@ -109,9 +110,9 @@ D2 = _=>def1=>def2=>continuation=>(
                 _=>def2(_)(rec1)(rec2)
             )
         )(
-            _=>rec(_)(first=>second=>first)
+            _=>rec(_)(_=>first=>second=>first)
         )(
-            _=>rec(_)(first=>second=>second)
+            _=>rec(_)(_=>first=>second=>second)
         )
     )
 )

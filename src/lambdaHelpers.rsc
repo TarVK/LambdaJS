@@ -30,7 +30,7 @@ public str wrapHelpers(str body, set[int] requiredDefiners) {
     for (funcCount <- requiredDefiners) 
         out = "($D<funcCount>=\><out>)(<createDefiner(funcCount)>)";
     out = "($Y=\><out>)(<Y>)";
-    out = "(_=\><out>)(_=\>_)";
+    out = "_=\><out>";
     return out;
 }
 
@@ -42,7 +42,7 @@ public str createDefiner(int recursiveFuncCount) {
     if (recursiveFuncCount==0)
         return "_=\>$0=\>c=\>c(_)($0)";
     // Hardcode 1, because there's no required tupling
-    if (recursiveFuncCount==0)
+    if (recursiveFuncCount==1)
         return "_=\>$0=\>c=\>(f=\>c(_)(f))(_=\>$Y(_)($0))";
     
     int c = recursiveFuncCount;
@@ -51,7 +51,7 @@ public str createDefiner(int recursiveFuncCount) {
     // Call the continuation, given the recursive function
     out += "(f=\>c(_)";
     for (i <- [0..c]) 
-        out += "(_=\>f(_)(<defineParams("s", c)>$s<i>))";
+        out += "(_=\>f(_)(_=\><defineParams("s", c)>$s<i>(_)))";
     out += ")";
     // Create recursive functions to provide
     out += "(_=\>$Y(_)(_=\>r=\>(";
@@ -60,7 +60,7 @@ public str createDefiner(int recursiveFuncCount) {
         out += "(_=\>$<i>(_)<applyArgs("r", c)>)";
     out += ")";
     for (i <- [0..c])
-        out += "(_=\>r(_)(<defineParams("s", c)>$s<i>))";
+        out += "(_=\>r(_)(_=\><defineParams("s", c)>$s<i>(_)))";
     out += "))";
     
     return out;

@@ -10,7 +10,8 @@ public data Const = Const(
 
 public data Declarations = Declarations(
     map[str, Const] constructors,
-    map[str, list[Function]] functions
+    map[str, list[Function]] functions,
+    Maybe[Output] output
 );
 
 
@@ -29,6 +30,10 @@ public data Error = TooFewArguments(
     Constructor duplicate
 ) | UnknownFunction (
     Identifier
+) | MissingOutput(
+) | DuplicateOutput(
+    Output output,
+    Output duplicateOutput
 );
 
 public alias WithErrors[&U] = tuple[&U, Errors];

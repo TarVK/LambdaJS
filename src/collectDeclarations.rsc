@@ -8,6 +8,7 @@ import util::Maybe;
 public WithErrors[Declarations] collectDeclarations(Program program) {
     map[str, Const] constructors = ("Undefined": Const("Undefined", 0, nothing()));
     map[str, list[Function]] functions = ();
+    Maybe[Output] output = nothing(); 
     Errors errors = {};
     
     visit (program) {
@@ -27,7 +28,16 @@ public WithErrors[Declarations] collectDeclarations(Program program) {
                 functions[name] += function;
             }
         }
+        case (Statement)`<Output out>`: {
+            if(just(curOut) := output) {
+                errors += DuplicateOutput(curOut, out);
+            } else
+                output = just(out);
+        }
     }
     
-    return <Declarations(constructors, functions), errors>;
+    if(nothing() := output)
+        errors += MissingOutput();
+    
+    return <Declarations(constructors, functions, output), errors>;
 }

@@ -15,16 +15,17 @@ import lambdaHelpers;
 import jsDataConverters;
 import util::Maybe;
 
-
 public Program parse(str txt) {
     try 
-        return parse(#Program, txt);
+        return parse(#Program, txt, allowAmbiguity=true);
     catch Ambiguity(loc l, str s, _):
         println("the input is ambiguous for <s> on line <l.begin.line>");
     throw "";
 }
 public void testProgram() {
     Program program = parse(readFile(|file:///I:/projects/Github/LambdaJS/src/testSyntax.txt|));
+    
+    //program = replaceKeywords(program); // Why doesn't this work??
     
     Errors allErrors = {};
     if (<Declarations(constructors, functionDeclarations, optOutput), declarationErrors> := collectDeclarations(program)) {
@@ -34,7 +35,7 @@ public void testProgram() {
         if (just(out) := optOutput)
             if ((Output)`output <Expression exp> ;` := out)
                 output = lazyLambdaExpression(exp, ());
-                
+                                
         list[Const] constructorList = getConstructorList(constructors);
         if (<order, unknownErrors> := orderDeclarations(functionDeclarations, constructors)) {
             allErrors += unknownErrors;
@@ -45,7 +46,7 @@ public void testProgram() {
                     declarations += DG(false, (name: compileConstructor(constructor, constructorList)));
             
             set[int] definerSizes = {0};
-            for (fg <- order)
+            for (fg <- order) {
                 if (FG(recurses, funcNames) := fg) {
                     map[str, str] definitions = ();
                     for(str funcName <- funcNames) {
@@ -63,10 +64,12 @@ public void testProgram() {
                     declarations += DG(recurses, definitions);
                     if(recurses) definerSizes += size(funcNames);
                 }
+            }
                 
             str body = combineDefinitions(declarations, output);
             str out = wrapHelpers(body, definerSizes);
             
+            println();
             println(asStr(allErrors));
             println();
             println("v = "+out);
@@ -97,3 +100,30 @@ public str asStr(UnknownConstructor(id)) = "UnknownConstructor(<id>)";
 public str asStr([Structure st, *rest]) = "<st>, <asStr(rest)>";
 public str asStr([]) = "";
 
+
+
+set[str] jsKeywords = {"if"};
+public Identifier removeKeyword(Identifier id) {
+    if ("<id>" in jsKeywords) return parse(#Identifier, "$<id>"); // There's a better way to do this, right?
+    return id;
+} 
+
+public Program replaceKeywords(Program program) =
+    innermost visit (program) {
+        case (Function)`<Identifier id> <SimpleStructure* ss> "=" <Expression exp>;`: {
+            Identifier newId = removeKeyword(id);
+            return (Function)`<Identifier newId> <SimpleStructure* SS> "=" <Expression exp>;`;
+        }
+        case (SimpleStructure)`<Identifier id>`: {
+            Identifier newId = removeKeyword(id);
+            return (SimpleStructure)`<Identifier newId>`;
+        }
+        case (Structure)`<Identifier id> <SimpleStructure* ss>`: {
+            Identifier newId = removeKeyword(id);
+            return (Structure)`<Identifier newId> <SimpleStructure* ss>`;
+        }
+        case (SimpleExpression)`<Identifier id>`: {
+            Identifier newId = removeKeyword(id);
+            return (SimpleExpression)`<Identifier newId>`;
+        }
+    };

@@ -6,12 +6,9 @@ lessThan Z (S x) = True;
 lessThan x Z = False;
 lessThan (S x) (S y) = lessThan x y;
 
-// Boolean constructors and functions
+// Boolean constructors
 False;
 True;
-
-if True x y = x;
-if False x y = y;
 
 // List constructors (linked list of sorts)
 Cons head tail;
@@ -20,10 +17,8 @@ Nill;
 concat Nill list = list;
 concat (Cons head tail) list = Cons head (concat tail list);
 
-// Pair constructor and functions
+// Pair constructor
 Pair el1 el2;
-first (Pair el1 el2) = el1;
-second (Pair el1 el2) = el2;
 
 // A function to append a value to either the left or right list, given a Pair of lists
 append val (Pair list1 list2) True = Pair (Cons val list1) list2;
@@ -48,6 +43,6 @@ v1 = S v0;
 v2 = S v1;
 v3 = S v2;
 v4 = S v3;
-list = Cons v3 (Cons V4 (Cons V1 (Cons V0 Nill)));
+list = Cons v3 (Cons v4 (Cons v1 (Cons v0 Nill)));
 
 output quicksort list;

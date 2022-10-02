@@ -2,7 +2,7 @@ module compileFunction
 import Lang;
 import abstractData;
 import List;
-
+import IO;
 
 public str compileFunction(Undefined(), list[Const] constructors)
     = "Undefined(_)";

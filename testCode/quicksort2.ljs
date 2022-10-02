@@ -10,6 +10,9 @@ lessThan (S x) (S y) = lessThan x y;
 False;
 True;
 
+iff True x y = x;
+iff False x y = y; 
+
 // List constructors (linked list of sorts)
 Cons head tail;
 Nill;
@@ -21,13 +24,13 @@ concat (Cons head tail) list = Cons head (concat tail list);
 Pair el1 el2;
 
 // A function to append a value to either the left or right list, given a Pair of lists
-append val (Pair list1 list2) True = Pair (Cons val list1) list2;
-append val (Pair list1 list2) False = Pair list1 (Cons val list2);  
+appendFirst val (Pair list1 list2) = Pair (Cons val list1) list2;
+appendSecond val (Pair list1 list2) = Pair list1 (Cons val list2);  
 
 // Quicksort (except it's not quick at all when compiled)
 partition val Nill = Pair Nill Nill;
 partition val (Cons head tail) 
-    = append head (partition val tail) (lessThan head val);
+    = (iff (lessThan head val) appendFirst appendSecond) head (partition val tail);
     
 quicksort Nill = Nill;
 quicksort (Cons head tail) = quicksort head (partition head tail);
@@ -43,6 +46,10 @@ v1 = S v0;
 v2 = S v1;
 v3 = S v2;
 v4 = S v3;
-list = Cons v3 (Cons v4 (Cons v1 (Cons v0 Nill)));
+v5 = S v4;
+v6 = S v5;
+v7 = S v6;
+v8 = S v7;
+list = Cons v7 (Cons v0 (Cons v3 (Cons v4 (Cons v1 (Cons v0 Nill)))));
 
 output quicksort list;

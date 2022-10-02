@@ -38,9 +38,13 @@ public MatchListOrError createMatchList(
     list[Const] constructors,
     Function function
 ) {
-    if((Function)`<Identifier name> <SimpleStructure* args> = <Expression body>;` := function) {
+    if((Function)`<Identifier name> <SimpleStructure+ args> = <Expression body>;` := function) {
         MatchList end = End(function, body);
         return createMatchList(constructors, 0, end, [ss | SimpleStructure ss <- args]);
+    }
+    else if((Function)`<Identifier name> = <Expression body>;` := function) {
+        MatchList end = End(function, body);
+        return createMatchList(constructors, 0, end, []);
     }
     throw "error, shouldn\'t be reachable";
 }
@@ -49,9 +53,9 @@ public MatchListOrError createMatchList(list[Const] constructors, int depth, Mat
         case (Structure)`<Identifier const> <SimpleStructure* params>`: {
             list[SimpleStructure] paramList = [ss | SimpleStructure ss <- params];
             if (just(constructor) := findConstructor(constructors, "<const>")) {
-                MatchListOrError newNext = createMatchList(constructors, depth+1, next, paramList);
-                if (ML(next) := newNext) return ML(Match(depth, constructor, next, val));
-                return newNext;
+                MatchListOrError optNext = createMatchList(constructors, depth+1, next, paramList);
+                if (ML(newNext) := optNext) return ML(Match(depth, constructor, newNext, val));
+                return optNext;
             }
             
             if(size(paramList)==0)
@@ -61,19 +65,19 @@ public MatchListOrError createMatchList(list[Const] constructors, int depth, Mat
         } 
         case [(SimpleStructure)`<Identifier first>`, *rest]: {
             if (just(constructor) := findConstructor(constructors, "<first>")) {
-                MatchListOrError newNext = createMatchList(constructors, depth, next, rest);
-                if (ML(next) := newNext) return ML(Match(depth, constructor, next, (Structure)`<Identifier first>`));
-                return newNext;
+                MatchListOrError optNext = createMatchList(constructors, depth, next, rest);
+                if (ML(newNext) := optNext) return ML(Match(depth, constructor, newNext, (Structure)`<Identifier first>`));
+                return optNext;
             }
                 
-            MatchListOrError newNext = createMatchList(constructors, depth, next, rest);
-            if (ML(next) := newNext) return ML(Variable(depth, "<first>", next, first));
-            return newNext;
+            MatchListOrError optNext = createMatchList(constructors, depth, next, rest);
+            if (ML(newNext) := optNext) return ML(Variable(depth, "<first>", newNext, first));
+            return optNext;
         }
         case [(SimpleStructure)`(<Structure substructure>)`, *rest]: {
-            MatchListOrError newNext = createMatchList(constructors, depth, next, rest);
-            if (ML(next) := newNext) return createMatchList(constructors, depth, next, substructure);
-            return newNext;
+            MatchListOrError optNext = createMatchList(constructors, depth, next, rest);
+            if (ML(newNext) := optNext) return createMatchList(constructors, depth, newNext, substructure);
+            return optNext;
         }
     }
     return ML(next);
@@ -114,6 +118,10 @@ public Maybe[SubstitutedMatchList] constNext(<Match(_, c, next, _), Substitution
 }   
 public Maybe[SubstitutedMatchList] constNext(<Variable(_, name, next, _), Substitution sub, false>, list[int] param, Const const) 
     = just(<next, sub + (name: param), true>);
+//{
+//    println("<name>: <param>");
+//    return just(<next, sub + (name: param), true>);
+//} 
 public Maybe[SubstitutedMatchList] constNext(<End(func, exp), Substitution sub, false>, list[int] param, Const const) 
     = just(<End(func, exp), sub, false>);
     

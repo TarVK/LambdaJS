@@ -4,6 +4,7 @@ import Lang;
 import asStr;
 import List;
 import util::Maybe;
+import IO;
 
 public WithErrors[Declarations] collectDeclarations(Program program) {
     map[str, Const] constructors = ("Undefined": Const("Undefined", 0, nothing()));
@@ -22,11 +23,12 @@ public WithErrors[Declarations] collectDeclarations(Program program) {
             }
         }
         case (Declaration)`<Function function>`: {
-            if ((Function)`<Identifier id> <SimpleStructure* _> = <Expression _>;` := function) {
-                str name = "<id>";
-                if (!(name in functions)) functions[name] = [];
-                functions[name] += function;
-            }
+            str name;
+            if ((Function)`<Identifier id> <SimpleStructure+ _> = <Expression _>;` := function) name = "<id>"; 
+            else if((Function)`<Identifier id> = <Expression _>;` := function) name = "<id>";
+            
+            if (!(name in functions)) functions[name] = [];
+            functions[name] += function;
         }
         case (Statement)`<Output out>`: {
             if(just(curOut) := output) {

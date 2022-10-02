@@ -19,7 +19,7 @@ public set[Identifier] dependencies([], set[str] constructors, bool includePatte
     = {};
     
 public set[Identifier] dependencies(
-    (Function)`<Identifier _> <SimpleStructure* paramStruct> = <Expression body>;`, 
+    (Function)`<Identifier _> <SimpleStructure+ paramStruct> = <Expression body>;`, 
     set[str] constructors, 
     bool includePattern
 ) {
@@ -27,6 +27,14 @@ public set[Identifier] dependencies(
     if(includePattern) references += dependencies([s | s <- paramStruct]);
     set[str] params = parameters([s | s <- paramStruct], constructors);
     return {r | r <- references, !("<r>" in params)};
+}
+public set[Identifier] dependencies(
+    (Function)`<Identifier _> = <Expression body>;`, 
+    set[str] constructors, 
+    bool includePattern
+) {
+    set[Identifier] references = dependencies(body);
+    return {r | r <- references};
 }
 
 public set[Identifier] dependencies((Expression)`<SimpleExpression+ ss>`)

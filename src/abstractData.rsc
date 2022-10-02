@@ -28,12 +28,14 @@ public data Error = TooFewArguments(
 ) | DuplicateDecaration(
     Const constructor,
     Constructor duplicate
-) | UnknownFunction (
+) | UnknownIdentifier (
     Identifier
 ) | MissingOutput(
 ) | DuplicateOutput(
     Output output,
     Output duplicateOutput
+) | UnknownConstructor(
+    Identifier unknownConstructor
 );
 
 public alias WithErrors[&U] = tuple[&U, Errors];

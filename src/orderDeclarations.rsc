@@ -8,17 +8,24 @@ import IO;
 // Retrieving dependencies
 alias Dependencies = map[str, set[Identifier]];
 
-public Dependencies dependencies(map[str, list[Function]] functions) 
-    = (name: dependencies(functions[name]) | name <- functions);
+public Dependencies dependencies(map[str, list[Function]] functions, set[str] constructors) 
+    = dependencies(functions, constructors, true);
+public Dependencies dependencies(map[str, list[Function]] functions, set[str] constructors, bool includePattern) 
+    = (name: dependencies(functions[name], constructors, includePattern) | name <- functions);
     
-public set[Identifier] dependencies([Function function, *rest])
-     = dependencies(function) + dependencies(rest);
-public set[Identifier] dependencies([])
+public set[Identifier] dependencies([Function function, *rest], set[str] constructors, bool includePattern)
+     = dependencies(function, constructors, includePattern) + dependencies(rest, constructors, includePattern);
+public set[Identifier] dependencies([], set[str] constructors, bool includePattern)
     = {};
     
-public set[Identifier] dependencies((Function)`<Identifier _> <SimpleStructure* paramStruct> = <Expression body>;`) {
-    set[Identifier] references = dependencies(body) + dependencies([s | s <- paramStruct]);
-    set[str] params = parameters([s | s <- paramStruct]);
+public set[Identifier] dependencies(
+    (Function)`<Identifier _> <SimpleStructure* paramStruct> = <Expression body>;`, 
+    set[str] constructors, 
+    bool includePattern
+) {
+    set[Identifier] references = dependencies(body);
+    if(includePattern) references += dependencies([s | s <- paramStruct]);
+    set[str] params = parameters([s | s <- paramStruct], constructors);
     return {r | r <- references, !("<r>" in params)};
 }
 
@@ -34,14 +41,19 @@ public set[Identifier] dependencies([(SimpleStructure)`<Identifier id>`, *rest])
     = dependencies(rest);
 public set[Identifier] dependencies([(SimpleStructure)`(<Structure substructure>)`, *rest])
     = dependencies(substructure) + dependencies(rest);
+public set[Identifier] dependencies([])
+    = {};
     
-public set[str] parameters((Structure)`<Identifier _> <SimpleStructure* ss>`) 
-    = parameters([s | s <- ss]);
-public set[str] parameters([(SimpleStructure)`<Identifier id>`, *rest])
-    = {"<id>"} + parameters(rest);
-public set[str] parameters([(SimpleStructure)`(<Structure substructure>)`, *rest])
-    = parameters(substructure) + parameters(rest);
-public set[str] parameters([])
+public set[str] parameters((Structure)`<Identifier const> <SimpleStructure* ss>`, set[str] constructors) {
+    set[str] params = parameters([s | s <- ss], constructors);
+    if (!("<const>" in constructors) && size(params) == 0) return {"<const>"};
+    return params; 
+} 
+public set[str] parameters([(SimpleStructure)`<Identifier id>`, *rest], set[str] constructors)
+    = {"<id>"} + parameters(rest, constructors);
+public set[str] parameters([(SimpleStructure)`(<Structure substructure>)`, *rest], set[str] constructors)
+    = parameters(substructure, constructors) + parameters(rest, constructors);
+public set[str] parameters([], set[str] constructors)
     = {};
     
 // Create strongly connected components in the right order, adapted from: https://www.geeksforgeeks.org/strongly-connected-components/
@@ -106,7 +118,7 @@ public Errors getUnknownFunctions(Dependencies dependencies, set[str] funcs)
     = ({} | it + getUnknownFunctions(dependencies[name], funcs) | name <- dependencies);
 public Errors getUnknownFunctions({Identifier dependency, *rest}, set[str] funcs) {
     if ("<dependency>" in funcs) return getUnknownFunctions(rest, funcs);
-    else return UnknownFunction(dependency) + getUnknownFunctions(rest, funcs);   
+    else return UnknownIdentifier(dependency) + getUnknownFunctions(rest, funcs);   
 } 
 public Errors getUnknownFunctions({}, set[str] funcs) 
     = {};   
@@ -118,11 +130,12 @@ public data FunctionGroup = FG(
 );
 
 public WithErrors[FunctionOrder] orderDeclarations(map[str, list[Function]] functions,  map[str, Const] constructors) {
-    Dependencies d = dependencies(functions);
+    set[str] constNames = {c | c <- constructors};
+    Dependencies d = dependencies(functions, constNames);
     StringDependencies sd = stringDependencies(d);
     list[set[str]] components = getSCC(sd);
     return <
         [FG(size(component) > 1 || (v in sd[v]), component) | component <- components, v := getOneFrom(component)],
-        getUnknownFunctions(d, {f | f <- functions} + {c | c <- constructors})
+        getUnknownFunctions(dependencies(functions, constNames, false), {f | f <- functions} + constNames)
     >;
 }

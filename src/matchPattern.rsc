@@ -5,7 +5,6 @@ import List;
 import IO;
 import util::Math;
 import abstractData;
-import asStr;
 
 // Create a matchList from the Structure CST, to simplify matching
 data MatchList = Match(
@@ -22,6 +21,7 @@ data MatchList = Match(
     Function func,
     Expression expression
 );
+data MatchListOrError = ML(MatchList ml) | E(Error);
 
 str asStr(Match(depth, Const(name, _, _), rest, _)) {
     str restStr = asStr(rest);
@@ -34,7 +34,7 @@ str asStr(Variable(depth, name, rest, _)) {
 str asStr(End(_, _)) = "null";
 
 
-public MatchList createMatchList(
+public MatchListOrError createMatchList(
     list[Const] constructors,
     Function function
 ) {
@@ -42,42 +42,41 @@ public MatchList createMatchList(
         MatchList end = End(function, body);
         return createMatchList(constructors, 0, end, [ss | SimpleStructure ss <- args]);
     }
-    throw "error"; // TODO:
+    throw "error, shouldn\'t be reachable";
 }
-public MatchList createMatchList(
-    list[Const] constructors, 
-    int depth, 
-    MatchList next,
-    value val) {
+public MatchListOrError createMatchList(list[Const] constructors, int depth, MatchList next, value val) {
     switch (val) {
         case (Structure)`<Identifier const> <SimpleStructure* params>`: {
-            if (just(constructor) := findConstructor(constructors, asStr(const)))
-                return Match(
-                    depth, 
-                    constructor, 
-                    createMatchList(constructors, depth+1, next, [ss | SimpleStructure ss <- params]),
-                    val);
-            // TODO: proper error handling in type
-            throw "Error";
+            list[SimpleStructure] paramList = [ss | SimpleStructure ss <- params];
+            if (just(constructor) := findConstructor(constructors, "<const>")) {
+                MatchListOrError newNext = createMatchList(constructors, depth+1, next, paramList);
+                if (ML(next) := newNext) return ML(Match(depth, constructor, next, val));
+                return newNext;
+            }
+            
+            if(size(paramList)==0)
+                return ML(Variable(depth, "<const>", next, const));
+                    
+            return E(UnknownConstructor(const));
         } 
         case [(SimpleStructure)`<Identifier first>`, *rest]: {
-            if (just(constructor) := findConstructor(constructors, asStr(first)))
-                return Match(
-                    depth, 
-                    constructor, 
-                    createMatchList(constructors, depth, next, rest),
-                    (Structure)`<Identifier first>`);
-            return Variable(
-                depth, 
-                asStr(first), 
-                createMatchList(constructors, depth, next, rest),
-                first);
+            if (just(constructor) := findConstructor(constructors, "<first>")) {
+                MatchListOrError newNext = createMatchList(constructors, depth, next, rest);
+                if (ML(next) := newNext) return ML(Match(depth, constructor, next, (Structure)`<Identifier first>`));
+                return newNext;
+            }
+                
+            MatchListOrError newNext = createMatchList(constructors, depth, next, rest);
+            if (ML(next) := newNext) return ML(Variable(depth, "<first>", next, first));
+            return newNext;
         }
         case [(SimpleStructure)`(<Structure substructure>)`, *rest]: {
-            return createMatchList(constructors, depth, createMatchList(constructors, depth, next, rest), substructure);
+            MatchListOrError newNext = createMatchList(constructors, depth, next, rest);
+            if (ML(next) := newNext) return createMatchList(constructors, depth, next, substructure);
+            return newNext;
         }
-    }    
-    return next;
+    }
+    return ML(next);
 }
     
 public Maybe[Const] findConstructor([Const first, *rest], str name) {

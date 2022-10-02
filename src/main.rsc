@@ -15,9 +15,17 @@ import lambdaHelpers;
 import jsDataConverters;
 import util::Maybe;
 
-public Program parse(str txt) = parse(#Program, txt);
+
+public Program parse(str txt) {
+    try 
+        return parse(#Program, txt);
+    catch Ambiguity(loc l, str s, _):
+        println("the input is ambiguous for <s> on line <l.begin.line>");
+    throw "";
+}
 public void testProgram() {
     Program program = parse(readFile(|file:///I:/projects/Github/LambdaJS/src/testSyntax.txt|));
+    
     Errors allErrors = {};
     if (<Declarations(constructors, functionDeclarations, optOutput), declarationErrors> := collectDeclarations(program)) {
         allErrors += declarationErrors;
@@ -42,11 +50,15 @@ public void testProgram() {
                     map[str, str] definitions = ();
                     for(str funcName <- funcNames) {
                         list[Function] functions = functionDeclarations[funcName];
-                        list[SubstitutedMatchList] matches = [<createMatchList(constructorList, function), (), false> | function <- functions];
+                        
+                        list[MatchListOrError] matchLists = [createMatchList(constructorList, function) | function <- functions]; 
+                        list[SubstitutedMatchList] matches = [<ml, (), false> | mlOrError <- matchLists, ML(ml) := mlOrError];
                         if(<split, patternErrors> := createMatchTree(constructorList, matches)){
                             allErrors += patternErrors;                        
                             definitions += (funcName: compileFunction(split, constructorList));
                         }
+                        
+                        for(E(error) <- matchLists) allErrors += error;
                     }
                     declarations += DG(recurses, definitions);
                     if(recurses) definerSizes += size(funcNames);
@@ -55,7 +67,7 @@ public void testProgram() {
             str body = combineDefinitions(declarations, output);
             str out = wrapHelpers(body, definerSizes);
             
-            println(allErrors);
+            println(asStr(allErrors));
             println();
             println("v = "+out);
             println();
@@ -71,4 +83,17 @@ public void testProgram() {
 
 public list[Const] getConstructorList(map[str, Const] constructors) 
     = [constructors[s] | s <- constructors];
+    
+public str asStr({Error error, *rest}) = "<asStr(error)>, <asStr(rest)>";
+public str asStr({}) = "";
+public str asStr(TooFewArguments(Const(constr, _, _), struct)) = "TooFewArguments(<constr>, <struct>)";
+public str asStr(TooManyArguments(Const(constr, _, _), struct)) = "TooManyArguments(<constr>, <struct>)";
+public str asStr(TooFewParameters(longerAlts, struct)) = "TooFewParameters([<asStr(longerAlts)>], <struct>)";
+public str asStr(DuplicateDecaration(Const(constr, _, _), dupl)) = "DuplicateDeclaration(<constr>, <dupl>)";
+public str asStr(UnknownIdentifier(id)) = "UnknownIdentifier(<id>)";
+public str asStr(MissingOutput()) = "MissingOutput()";
+public str asStr(DuplicateOutput(output, duplicate)) = "DuplicateOutput(<output>, <duplicate>)";
+public str asStr(UnknownConstructor(id)) = "UnknownConstructor(<id>)";
+public str asStr([Structure st, *rest]) = "<st>, <asStr(rest)>";
+public str asStr([]) = "";
 

@@ -41,7 +41,7 @@ Finally, we can use the keyword `output` followed by an expression in order to s
 ### Quicksort
 Below is an implementation of quicksort using ljs. This code already specifies the value to operate on as part of the script. But alternatively one may simple put `output quicksort` to output the function itself, which can then be applied to any value.
 
-```json5
+```
 // Natural number constructors, peano numbers (Zero and Successor) and functions
 Z;
 S nat;

@@ -8,7 +8,7 @@ The testCode folder contains ljs code and some of the corresponding JS code.
 ljs is a minimalistic pattern-matching based language. 
 
 You can declare constructors by specfying a name followed by names for each parameter of the contructor, e.g.:
-```swift
+```
 SomeNullaryConstructor;
 SomeBinaryConstructor param1 param2;
 ```
@@ -20,7 +20,7 @@ The declaration of a function can specify that a value created using a specific 
 
 We can for instance create constructors `True` and `False` to represent booleans, and `S` (successor) and `Z` (zero) to represent natural numbers. `S` will take one argument, and specifies that the value is one higher than the argument. Then using these constructors, we can define the function `isEven` using two declarations and the helper function `not`:
 
-```swift
+```
 True;
 False;
 
@@ -41,7 +41,7 @@ Finally, we can use the keyword `output` followed by an expression in order to s
 ### Quicksort
 Below is an implementation of quicksort using ljs. This code already specifies the value to operate on as part of the script. But alternatively one may simple put `output quicksort` to output the function itself, which can then be applied to any value.
 
-```swift
+```json5
 // Natural number constructors, peano numbers (Zero and Successor) and functions
 Z;
 S nat;

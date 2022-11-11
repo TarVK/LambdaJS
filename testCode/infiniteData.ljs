@@ -1,0 +1,33 @@
+// Natural number constructors, peano numbers (Zero and Successor) and functions
+Z;
+S nat;
+
+lessThan Z (S x) = True;
+lessThan x Z = False;
+lessThan (S x) (S y) = lessThan x y;
+
+// Boolean constructors
+False;
+True;
+
+not True = False;
+not False = True;
+
+// List constructors (linked list of sorts)
+Cons head tail;
+Nill;
+
+concat Nill list = list;
+concat (Cons head tail) list = Cons head (concat tail list);
+
+firstX x Nill = Nill;
+firstX Z (Cons head tail) = Nill;
+firstX (S x) (Cons head tail) = Cons head (firstX x tail); 
+
+map f Nill = Nill;
+map f (Cons head tail) = Cons (f head) (map f tail);
+
+// Infinite list of numbers, retrieve the first 10
+nats = Cons Z (map S nats);
+
+output firstX (S (S (S (S (S (S (S (S (S (S Z)))))))))) nats;

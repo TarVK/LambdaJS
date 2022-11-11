@@ -2,47 +2,39 @@
 Z;
 S nat;
 
-lessThan Z (S x) = True;
-lessThan x Z = False;
-lessThan (S x) (S y) = lessThan x y;
+add x Z = x;
+add x (S y) = S (add x y);
 
-// Boolean constructors
-False;
-True;
+sub x Z = x;
+sub Z y = Z;
+sub (S x) (S y) = sub x y;
 
-// List constructors (linked list of sorts)
+// List constructors (linked list of sorts) and functions
 Cons head tail;
 Nill;
 
-concat Nill list = list;
-concat (Cons head tail) list = Cons head (concat tail list);
+firstX x Nill = Nill;
+firstX Z (Cons head tail) = Nill;
+firstX (S x) (Cons head tail) = Cons head (firstX x tail);
 
-// Pair constructor
-Pair el1 el2;
+skipX Z list = list;
+skipX (S x) (Cons head tail) = skipX x tail;
+skipX (S x) Nill = Nill;
 
-// A function to append a value to either the left or right list, given a Pair of lists
-append val (Pair list1 list2) True = Pair (Cons val list1) list2;
-append val (Pair list1 list2) False = Pair list1 (Cons val list2);  
+slice start end list = firstX (sub end start) (skipX start list);
 
-// Quicksort (except it's not quick at all when compiled)
-partition val Nill = Pair Nill Nill;
-partition val (Cons head tail) 
-    = append head (partition val tail) (lessThan head val);
-    
-quicksort Nill = Nill;
-quicksort (Cons head tail) = quicksort head (partition head tail);
+map f Nill = Nill;
+map f (Cons head tail) = Cons (f head) (map f tail);
 
-quicksort val (Pair lessThan moreThan) 
-    = concat 
-        (quicksort lessThan) 
-        (Cons val (quicksort moreThan)); 
+// The infinite list of natural numbers
+nats = Cons Z (map S nats);
 
-// Perform quicksort on some sample data
-v0 = Z;
-v1 = S v0;
-v2 = S v1;
-v3 = S v2;
-v4 = S v3;
-list = Cons v3 (Cons v4 (Cons v1 (Cons v0 Nill)));
+// Sums the items in a list
+sum Nill = Z;
+sum (Cons head tail) = add head (sum tail);
 
-output quicksort list;
+// Output the sum of the numbers from 5 to 9
+V5 = (S (S (S (S (S Z)))));
+V10 = S (S (S (S (S V5))));
+
+output sum (slice V5 V10 nats);

@@ -126,7 +126,31 @@ console.log(decode(_=>v(_)(encode("(Cons (S Z) (Cons (Z) (Cons (S (S (S (S Z))))
 ```
 which will result in the same sorted list as above. 
 
+### Lazy evaluation
+Since all code is compiled to JS lambdas in such a way that they emulate lazy evaluation, we can create infinite data such as the list of all naturals:
+```
+natsFrom x = Cons x (natsFrom (S x));
+nats = natsFrom Z;
+```
 
+Now this infinite list can be treated as any other, and we can for instance use a function to get the first x elements:
+```
+firstX x Nill = Nill;
+firstX Z (Cons head tail) = Nill;
+firstX (S x) (Cons head tail) = Cons head (firstX x tail);
+
+output firstX (S (S (S Z))) nats;
+```
+
+The above would output the list of the numbers 0, 1, and 2.
+
+JavaScript's lambdas always first evaluate their arguments before executing the function, so it does not by default evaluate lazily. 
+To fix this, the compiler is made to obey the convention that any variable will be a "getter" function of a value instead.
+
+E.g. in JavaScript we would not write `(x=>x+1)(2)`, but instead would write `(x=>x(_)+1)(_=>2)`. So any value supplied as an argument is supplied as a function (with a redudant parameter) that returns the value. Then any location where a variable `x` is accessed, the `x` getter is applied to the `_` value. It's irrelevant what `_` is, since it's just a placeholder, but we usually make it the identity function: `_ = x=>x`.  
+
+This convention is also the reason that applying arguments in JS to the compiled code is a little bit nasty. 
+While usually we would write `console.log(decode(v))`, if `v` takes an argument, we have to write `console.log(decode(_=>v(_)(encode(arg))))`. This is because we have to pass our value lazily to `decode`, so we have to pass a getter function, and we have to first obtain the function `v` from the lazy getter, by applying it to our dummy variable `_`. Only then we can supply our argument to this, which we can create using a string and the encode function, E.g. `console.log(decode(_=>v(_)(encode("(S (S Z))"))))`.  
 
 ### Compilation process
 This repository contains rascal code for compiling ljs code to lambda expressions in JS. The rascal code has however not been turned into any proper compiler or IDE tools yet, everything but a proper interface is present.

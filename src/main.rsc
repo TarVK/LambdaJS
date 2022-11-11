@@ -78,7 +78,8 @@ public void testProgram() {
             println();
             println(createJSDecoders(constructorList));
             println();
-            println("console.log(decode(_=\>v(_)(encode(\"(S (S Z))\"))))");
+            //println("console.log(decode(_=\>v(_)(encode(\"(S (S Z))\"))))");
+            println("console.log(decode(v))");
         }
     }
     

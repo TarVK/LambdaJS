@@ -2,32 +2,39 @@
 Z;
 S nat;
 
-lessThan Z (S x) = True;
-lessThan x Z = False;
-lessThan (S x) (S y) = lessThan x y;
+add x Z = x;
+add x (S y) = S (add x y);
 
-// Boolean constructors
-False;
-True;
+sub x Z = x;
+sub Z y = Z;
+sub (S x) (S y) = sub x y;
 
-not True = False;
-not False = True;
-
-// List constructors (linked list of sorts)
+// List constructors (linked list of sorts) and functions
 Cons head tail;
 Nill;
 
-concat Nill list = list;
-concat (Cons head tail) list = Cons head (concat tail list);
-
 firstX x Nill = Nill;
 firstX Z (Cons head tail) = Nill;
-firstX (S x) (Cons head tail) = Cons head (firstX x tail); 
+firstX (S x) (Cons head tail) = Cons head (firstX x tail);
+
+skipX Z list = list;
+skipX (S x) (Cons head tail) = skipX x tail;
+skipX (S x) Nill = Nill;
+
+slice start end list = firstX (sub end start) (skipX start list);
 
 map f Nill = Nill;
 map f (Cons head tail) = Cons (f head) (map f tail);
 
-// Infinite list of numbers, retrieve the first 10
+// The infinite list of natural numbers
 nats = Cons Z (map S nats);
 
-output firstX (S (S (S (S (S (S (S (S (S (S Z)))))))))) nats;
+// Sums the items in a list
+sum Nill = Z;
+sum (Cons head tail) = add head (sum tail);
+
+// Output the sum of the numbers from 5 to 9
+V5 = (S (S (S (S (S Z)))));
+V10 = S (S (S (S (S V5))));
+
+output sum (slice V5 V10 nats);

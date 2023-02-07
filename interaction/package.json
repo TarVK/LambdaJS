@@ -1,0 +1,14 @@
+{
+    "name": "lambdajs-interaction",
+    "version": "0.0.0",
+    "private": true,
+    "description": "A simple naive website for lambdajs interaction demoing/testing",
+    "scripts": {
+        "start": "static-server"
+    },
+    "author": "Tar van Krieken",
+    "license": "MIT",
+    "devDependencies": {
+        "static-server": "^2.2.1"
+    }
+}

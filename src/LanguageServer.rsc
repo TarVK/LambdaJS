@@ -39,7 +39,7 @@ set[LanguageService] lambdaJSContributions() = {
 // We allow users to evaluate the code from the output statement
 value lambdaJSExecutor(Command command) {
     if(execute(input) := command && just(<code, constructors>) := compileLambdaJS(input)) {
-        loc path = |https://tarvk.github.io/lambdaJS/interaction?constructors=<urlEncode(constructors)>&func=<urlEncode(code)>|;
+        loc path = |https://tarvk.github.io/LambdaJS/interaction?constructors=<urlEncode(constructors)>&func=<urlEncode(code)>|;
         browse(path);
         return ("result": true);
     }

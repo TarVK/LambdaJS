@@ -38,3 +38,4 @@ const cons = $(".console").console({
         this.inf("Data has been copied to clipboard");
     }
 });
+cons.info("Type 'exec' followed by the (constructor) arguments to execute the exported function");

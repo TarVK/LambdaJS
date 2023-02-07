@@ -40,16 +40,4 @@ quicksort val (Pair lessThan moreThan)
         (quicksort lessThan) 
         (Cons val (quicksort moreThan)); 
 
-// Perform quicksort on some sample data
-v0 = Z;
-v1 = S v0;
-v2 = S v1;
-v3 = S v2;
-v4 = S v3;
-v5 = S v4;
-v6 = S v5;
-v7 = S v6;
-v8 = S v7;
-list = Cons v7 (Cons v0 (Cons v3 (Cons v4 (Cons v1 (Cons v0 Nill)))));
-
-output quicksort list;
+output quicksort;

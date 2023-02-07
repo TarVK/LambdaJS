@@ -13,7 +13,7 @@ public str createJSEncoders(list[Const] constructors) {
         i += 1;
     }
     lookup += "}";
-    return "encode=r=\>{let t=[...r.split(/\\s*(?:\\b|(?=[)]))\\s*/),null],n=0,e=r=\>t[n]==r,l=()=\>t[n++],u=<lookup>,o=()=\>{let r=!1;e(\"(\")&&(l(),r=!0);let t=l();if(!(t in u))throw Error(`Unknown function \"${t}\"`);let[n,s]=u[t],i=s(r=\>r);for(let f=0;f\<n;f++){if(e(\")\")||e(null))throw Error(`Constructor \"${t}\" requires ${n} arguments`);i=i(o())}if(r&&!(e(\")\")||e(null)))throw Error(`Constructor \"${t}\" requires ${n} arguments`);return e(\")\")&&l(),r=\>i};return o()};";
+    return "const encode=r=\>{let t=[...r.split(/\\s*(?:\\b|(?=[)(]))\\s*/),null],n=0,e=r=\>t[n]==r,o=()=\>t[n++],l=<lookup>,u=()=\>{let r=!1;e(\"(\")&&(o(),r=!0);let t=o();if(!(t in l))throw Error(`Unknown constructor \"${t}\"`);let[n,s]=l[t],i=s(id);for(let c=0;c\<n;c++){if(e(\")\")||e(null))throw Error(`Constructor \"${t}\" requires ${n} arguments`);i=i(u())}if(r){if(!(e(\")\")||e(null)))throw Error(`Constructor \"${t}\" requires ${n} arguments`);e(\")\")&&o()}return r=\>i};return u()};";
 }
 
 
@@ -33,7 +33,7 @@ public str createJSDecoders(list[Const] constructors) {
 
 // A reference to the code that was minified
 str encodeReference = "encode = val=\>{
-    const tokens = [...val.split(/\\s*(?:\\b|(?=[)]))\\s*/), null];
+    const tokens = [...val.split(/\\s*(?:\\b|(?=[)(]))\\s*/), null];
     let i = 0;
     const peek = val=\>tokens[i]==val;
     const consume = ()=\>tokens[i++];
@@ -48,7 +48,7 @@ str encodeReference = "encode = val=\>{
         }
         
         const name = consume();
-        if(!(name in lookup)) throw Error(`Unknown function \"${name}\"`);
+        if(!(name in lookup)) throw Error(`Unknown constructor \"${name}\"`);
         const [argCount, func] = lookup[name];
 
         let val = func(_=\>_);
@@ -56,8 +56,10 @@ str encodeReference = "encode = val=\>{
             if(peek(\")\") || peek(null)) throw Error(`Constructor \"${name}\" requires ${argCount} arguments`);
             val = val(data());
         }
-        if(opened && !(peek(\")\") || peek(null))) throw Error(`Constructor \"${name}\" requires ${argCount} arguments`);
-        if(peek(\")\")) consume();
+        if(opened) {
+            if(!(peek(\")\") || peek(null))) throw Error(`Constructor \"${name}\" requires ${argCount} arguments`);
+            if(peek(\")\")) consume();
+        }
         return _=\>val;
     }
     

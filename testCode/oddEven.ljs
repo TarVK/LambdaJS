@@ -4,6 +4,7 @@ S nat;
 False;
 True;
 
+// Some comment
 isOdd Z = False;
 isOdd (S x) = isEven x;
 

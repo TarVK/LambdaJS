@@ -1,4 +1,5 @@
 module collectDeclarations
+import getSourceInfo;
 import abstractData;
 import Lang;
 import asStr;
@@ -6,7 +7,7 @@ import List;
 import util::Maybe;
 import IO;
 
-public WithErrors[Declarations] collectDeclarations(Program program) {
+public WithErrors[Declarations] collectDeclarations(start[Program] program) {
     map[str, Const] constructors = ("Undefined": Const("Undefined", 0, nothing()));
     map[str, list[Function]] functions = ();
     Maybe[Output] output = nothing(); 
@@ -14,19 +15,16 @@ public WithErrors[Declarations] collectDeclarations(Program program) {
     
     visit (program) {
         case (Declaration)`<Constructor const>`: {
-            if ((Constructor)`<Identifier+ parts>;` := const){
+            if ((Constructor)`<ConstructorName nameC> <Identifier* parts>;` := const){
                 list[Identifier] partsList = [p | Identifier p <- parts];
-                str name = "<head(partsList)>";
+                str name = "<nameC>";
                 
                 if (name in constructors) errors += DuplicateDecaration(constructors[name], const);   
-                else constructors += (name: Const(name, size(partsList)-1, just(const)));
+                else constructors += (name: Const(name, size(partsList), just(const)));
             }
         }
         case (Declaration)`<Function function>`: {
-            str name;
-            if ((Function)`<Identifier id> <SimpleStructure+ _> = <Expression _>;` := function) name = "<id>"; 
-            else if((Function)`<Identifier id> = <Expression _>;` := function) name = "<id>";
-            
+            str name = "<getName(function)>";            
             if (!(name in functions)) functions[name] = [];
             functions[name] += function;
         }

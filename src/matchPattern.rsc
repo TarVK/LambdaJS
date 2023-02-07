@@ -13,10 +13,10 @@ data MatchList = Match(
     MatchList rest,
     Structure structure
 ) | Variable(
-     int depth,
-     str name,
-     MatchList rest,
-     Identifier variable 
+    int depth,
+    str name,
+    MatchList rest,
+    Identifier variable 
 ) | End(
     Function func,
     Expression expression
@@ -38,13 +38,12 @@ public MatchListOrError createMatchList(
     list[Const] constructors,
     Function function
 ) {
-    if((Function)`<Identifier name> <SimpleStructure+ args> = <Expression body>;` := function) {
+    if(
+        (Function)`<Structure structure> = <Expression body>;` := function  &&
+        (Structure)`<Identifier name> <SimpleStructure* params>` := structure
+    ) {
         MatchList end = End(function, body);
-        return createMatchList(constructors, 0, end, [ss | SimpleStructure ss <- args]);
-    }
-    else if((Function)`<Identifier name> = <Expression body>;` := function) {
-        MatchList end = End(function, body);
-        return createMatchList(constructors, 0, end, []);
+        return createMatchList(constructors, 0, end, [p | p <- params]);
     }
     throw "error, shouldn\'t be reachable";
 }
@@ -60,7 +59,7 @@ public MatchListOrError createMatchList(list[Const] constructors, int depth, Mat
             
             if(size(paramList)==0)
                 return ML(Variable(depth, "<const>", next, const));
-                    
+
             return E(UnknownConstructor(const));
         } 
         case [(SimpleStructure)`<Identifier first>`, *rest]: {
@@ -240,8 +239,8 @@ bool hasFewerArgs((Structure)`<Identifier _> <SimpleStructure* s>`, Const(_, par
 Structure getStructure(<Match(_, _, next, _), x, y>) = getStructure(<next, x, y>);
 Structure getStructure(<Variable(_, _, next, _), x, y>) = getStructure(<next, x, y>);
 Structure getStructure(<End(func, _), _, _>) {
-    if((Function)`<Identifier name> <SimpleStructure* args> = <Expression _>;` := func)
-        return (Structure)`<Identifier name> <SimpleStructure* args>`;
+    if((Function)`<Structure structure> = <Expression _>;` := func)
+        return structure;
     else throw "unreachable";
 } 
 

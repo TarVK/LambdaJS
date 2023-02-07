@@ -1,3 +1,5 @@
+
+
 const setupFromURL = ()=>{
     const params = new URLSearchParams(location.search);
     setup(JSON.parse(params.get("constructors")), params.get("func"));
@@ -9,6 +11,8 @@ function setup(constructors, code){
     window.encode = encode;
     window.decode = decode;
     window.func = func;
+    
+    showFunction(code);
 }
 
 function copyToClipBoard(text) {
@@ -20,8 +24,38 @@ function copyToClipBoard(text) {
     inp.remove();
 }
 
-setupFromURL();
-window.addEventListener('locationchange', setupFromURL);
+function showFunction(code) {
+    const div = $("<div class=code></div>")[0];
+
+    const funcEditor = ace.edit(div);
+    funcEditor.setTheme("ace/theme/xcode");
+    funcEditor.getSession().setMode("ace/mode/javascript");
+    funcEditor.getSession().setUseWrapMode(true);
+    funcEditor.getSession().setUseSoftTabs(true);
+    funcEditor.setShowPrintMargin(false);
+    funcEditor.setOptions({ maxLines: 20.5, fontSize: "10px" });
+    funcEditor.$blockScrolling = Infinity;
+    funcEditor.renderer.setShowGutter(false);
+    funcEditor.setReadOnly(true);
+    funcEditor.renderer.$cursorLayer.element.style.display = "none";
+    funcEditor.setValue(code, -1);
+
+    cons.info("Loaded lambda calculus function:")
+    cons.$print("", new cons.HtmlElement(div));
+
+    const controls = $('<div class=codeControls><button class="copy">Copy code</button><button class="share">Share page</button></div>');
+    controls.find(".copy").on("click", ()=>{
+        copyToClipBoard(code);
+        cons.info("Code copied to clipboard!");
+    });
+    controls.find(".share").on("click", ()=>{
+        copyToClipBoard(location);
+        cons.info("Url copied to clipboard!");
+    });
+
+    cons.$print("", new cons.HtmlElement(controls));
+}
+
 const cons = $(".console").console({
     mode: "text",
     onInput(text){
@@ -38,4 +72,13 @@ const cons = $(".console").console({
         this.inf("Data has been copied to clipboard");
     }
 });
-cons.info("Type 'exec' followed by the (constructor) arguments to execute the exported function");
+
+try {
+    setupFromURL();
+    
+    cons.info("Type 'exec' followed by the (constructor) arguments to execute the exported function");
+    window.addEventListener('locationchange', setupFromURL);
+} catch (e) {
+    cons.error("Failed to load the code");
+    cons.error(e);
+}

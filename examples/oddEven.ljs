@@ -11,4 +11,4 @@ isOdd (S x) = isEven x;
 isEven Z = True;
 isEven (S x) = isOdd x;
 
-output isEven (S (S Z));
+output isEven;

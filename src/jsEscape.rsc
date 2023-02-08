@@ -11,7 +11,8 @@ public start[Program] jsEscape(start[Program] program) =
         case Identifier id => createID(jsEscape("<id>"))
     };
 
-public Identifier createID(str text) = parse(#Identifier, text);
+public Identifier createID(str text) = [Identifier]"<text>";
+
 public str jsEscape(str text: /^[0-9]+/) = "_<jsEscapeReplace(text)>";
 public str jsEscape(str text: /^(abstract|break|char|debugger|double|export|finally|goto|in|let|null|public|super|throw|try|volatile)$/) = "_<text>";
 public str jsEscape(str text: /^(arguments|byte|class|default|else|extends|float|if|instanceof|long|package|return|switch|throws|typeof|while)$/) = "_<text>";

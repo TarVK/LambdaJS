@@ -1,8 +1,8 @@
 # LambdaJS
-A minimal pattern matching based functional language "ljs" that compiles into pure lambda expressions in JS.
+A minimal pattern matching based functional language "ljs" that compiles into pure [lambda expressions in JS](https://tarvk.github.io/articles/lambda-calculus).
 This language has no practical applications, and was merely designed in order to mess around with the programming language [Rascal](https://www.rascal-mpl.org/).
 
-The testCode folder contains ljs code and some of the corresponding JS code.
+The [`examples`](tree/main/examples) folder contains ljs code, as well as a comment with their compiled counterpart in a link that can be used to evaluate it.
 
 ## Language
 ljs is a minimalistic pattern-matching based language. 
@@ -14,6 +14,7 @@ SomeBinaryConstructor param1 param2;
 ```
 
 By convention, we use capitallized names for constructors, while using lower case names for functions.
+We can create identifiers (function/constructor names) using alphanumeric symbol, as well as any of these symbols: `@$_[]{}<>&|+\-*/\!%^#?,.:'"`
 
 Functions can be declared just like constructors, but by adding an equal sign followed by an expression. An expression consists of (nested) constructors and functions applied to argument expressions. 
 The declaration of a function can specify that a value created using a specific constructor is expected, while destructuring its arguments. This is known as pattern matching. Multiple different declarations can be specified for the same function. 
@@ -38,8 +39,63 @@ This code specifies that our base case 0, is even. Any number `y` that's bigger 
 
 Finally, we can use the keyword `output` followed by an expression in order to specify what the code should output when compiled.
 
-### Quicksort
-Below is an implementation of quicksort using ljs. This code already specifies the value to operate on as part of the script. But alternatively one may simple put `output quicksort` to output the function itself, which can then be applied to any value.
+As mentioned before, symbols can also be used in names. Hence we could also write the following instead:
+```
+0;
+1+ nat;
+
+False;
+True;
+
+! True = False;
+! False = True;
+
+isOdd 0 = False;
+isOdd (1+ x) = !(isOdd x);
+
+output isOdd;
+```
+
+Note that we have to add a space between `!` and `True`, or else it is read as a single identifier `!True`. We don't have to do this for `!(...)` because `(` can't be part of an identifier. 
+The compiled code for this example can be executed here: [https://tarvk.github.io/LambdaJS/interaction/...](https://tarvk.github.io/LambdaJS/interaction/?constructors=[[%22False%22,0],[%221+%22,1],[%22True%22,0],[%22Undefined%22,0],[%220%22,0]]&func=_=%3E($Y=%3E($D0=%3E($D1=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$0(_))(_=%3EFalse=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$2(_)($0))(_=%3E_1_PLUS=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$2(_))(_=%3ETrue=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$3(_))(_=%3EUndefined=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$4(_))(_=%3E_0=%3E$D1(_)(_=%3E_EXC=%3E$0=%3E$0(_)(_=%3ETrue(_))(_=%3E$0$0=%3EUndefined(_))(_=%3EFalse(_))(_=%3EUndefined(_))(_=%3EUndefined(_)))(_=%3E_EXC=%3E$D1(_)(_=%3EisOdd=%3E$0=%3E$0(_)(_=%3EUndefined(_))(_=%3E$0$0=%3E_EXC(_)(_=%3E(isOdd(_)(_=%3E$0$0(_)))))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EFalse(_)))(_=%3EisOdd=%3EisOdd(_)))))))))(_=%3E$0=%3Ec=%3E(f=%3Ec(_)(f))(_=%3E$Y(_)($0))))(_=%3E$0=%3Ec=%3Ec(_)($0)))(_=%3Ef=%3E(x=%3Ef(_)(_=%3Ex(x)))(x=%3Ef(_)(_=%3Ex(x))))).
+
+## VSCode integration
+Using Rascal, a language server for this toy language was developed. This means the language has proper VSCode support, with the following features:
+- Syntax highlighting (for syntactically correct code)
+- An outline of the written code
+- Navigating to parameter/function/constructor definitions (ctrl-click)
+- Navigating to parameter/function/constructor usages (context-menu)
+- Hover docs for parameter/function/constructor mentioning their "type"
+- Error reporting for simple errors:
+    - Unknown identifiers
+    - Missing/too many outputs
+    - Duplicate constructor declarations
+    - Too few/many constructor arguments
+    - Too few function parameters (only in special cases, where it breaks compilation)
+- An evaluation [code lens](https://code.visualstudio.com/blogs/2017/02/12/code-lens-roundup), which opens a terminal to interact with the compiled code
+
+In order to use the VSCode integration, several steps are required:
+- Clone the repo, and open it as the root directory in VSCode
+- Install the [Rascal extension](https://marketplace.visualstudio.com/items?itemName=usethesource.rascalmpl)
+- Open a rascal terminal (`ctrl-shift-p` > `create rascal terminal`)
+- Enter: 
+    ```
+    import LanguageServer
+    main();
+    ```
+- Open any `.ljs` file in this VSCode session, and get ljs support.
+
+## Examples
+The [examples](tree/main/examples) directory contains several examples with their compiled equivalent:
+- [odd](tree/main/examples/odd.ljs)
+- [oddEven](tree/main/examples/oddEven.ljs)
+- [quicksort](tree/main/examples/quicksort.ljs)
+- [quicksort2](tree/main/examples/quicksort2.ljs)
+- [infiniteData](tree/main/examples/infiniteData.ljs)
+- [binary](tree/main/examples/binary.ljs)
+
+### Example code: Quicksort
+Below is an implementation of quicksort using ljs. This code already specifies the value to operate on as part of the script. But alternatively one may simple put `output quicksort` to output the function itself, which can then be applied to any value. This code can be evaluated [here](https://tarvk.github.io/LambdaJS/interaction/?constructors=[[%22False%22,0],[%22True%22,0],[%22Undefined%22,0],[%22Cons%22,2],[%22S%22,1],[%22Nill%22,0],[%22Z%22,0],[%22Pair%22,2]]&func=_=%3E($Y=%3E($D0=%3E($D1=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$7=%3E$0(_))(_=%3EFalse=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$7=%3E$1(_))(_=%3ETrue=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$7=%3E$2(_))(_=%3EUndefined=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$7=%3E$8=%3E$9=%3E$5(_)($0)($1))(_=%3ECons=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$7=%3E$8=%3E$5(_)($0))(_=%3ES=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$7=%3E$5(_))(_=%3ENill=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$7=%3E$6(_))(_=%3EZ=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$7=%3E$8=%3E$9=%3E$9(_)($0)($1))(_=%3EPair=%3E$D1(_)(_=%3ElessThan=%3E$0=%3E$0(_)(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EFalse(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_)))(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EFalse(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_)))(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EFalse(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_)))(_=%3E$0$0=%3E$0$1=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EFalse(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_)))(_=%3E$0$0=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3ElessThan(_)(_=%3E$0$0(_))(_=%3E$1$0(_)))(_=%3EUndefined(_))(_=%3EFalse(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_)))(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EFalse(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_)))(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3ETrue(_))(_=%3EUndefined(_))(_=%3EFalse(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_)))(_=%3E$0$0=%3E$0$1=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EFalse(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))))(_=%3ElessThan=%3E$D1(_)(_=%3Eappend=%3E$0=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3E$2=%3E$2(_)(_=%3EPair(_)(_=%3E$1$0(_))(_=%3E(Cons(_)(_=%3E$0(_))(_=%3E$1$1(_)))))(_=%3EPair(_)(_=%3E(Cons(_)(_=%3E$0(_))(_=%3E$1$0(_))))(_=%3E$1$1(_)))(_=%3EUndefined(_))(_=%3E$2$0=%3E$2$1=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$2$0=%3E$2$1=%3EUndefined(_))))(_=%3Eappend=%3E$D1(_)(_=%3Epartition=%3E$0=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3Eappend(_)(_=%3E$1$0(_))(_=%3E(partition(_)(_=%3E$0(_))(_=%3E$1$1(_))))(_=%3E(lessThan(_)(_=%3E$1$0(_))(_=%3E$0(_)))))(_=%3E$1$0=%3EUndefined(_))(_=%3EPair(_)(_=%3ENill(_))(_=%3ENill(_)))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_)))(_=%3Epartition=%3E$D1(_)(_=%3Econcat=%3E$0=%3E$0(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$0$0=%3E$0$1=%3E$1=%3ECons(_)(_=%3E$0$0(_))(_=%3E(concat(_)(_=%3E$0$1(_))(_=%3E$1(_)))))(_=%3E$0$0=%3EUndefined(_))(_=%3E$1=%3E$1(_))(_=%3EUndefined(_))(_=%3E$0$0=%3E$0$1=%3EUndefined(_)))(_=%3Econcat=%3E$D1(_)(_=%3Equicksort=%3E$0=%3E$0(_)(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3Econcat(_)(_=%3E(quicksort(_)(_=%3E$1$0(_))))(_=%3E(Cons(_)(_=%3E$0(_))(_=%3E(quicksort(_)(_=%3E$1$1(_))))))))(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3Econcat(_)(_=%3E(quicksort(_)(_=%3E$1$0(_))))(_=%3E(Cons(_)(_=%3E$0(_))(_=%3E(quicksort(_)(_=%3E$1$1(_))))))))(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3Econcat(_)(_=%3E(quicksort(_)(_=%3E$1$0(_))))(_=%3E(Cons(_)(_=%3E$0(_))(_=%3E(quicksort(_)(_=%3E$1$1(_))))))))(_=%3E$0$0=%3E$0$1=%3Equicksort(_)(_=%3E$0$0(_))(_=%3E(partition(_)(_=%3E$0$0(_))(_=%3E$0$1(_)))))(_=%3E$0$0=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3Econcat(_)(_=%3E(quicksort(_)(_=%3E$1$0(_))))(_=%3E(Cons(_)(_=%3E$0(_))(_=%3E(quicksort(_)(_=%3E$1$1(_))))))))(_=%3ENill(_))(_=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3Econcat(_)(_=%3E(quicksort(_)(_=%3E$1$0(_))))(_=%3E(Cons(_)(_=%3E$0(_))(_=%3E(quicksort(_)(_=%3E$1$1(_))))))))(_=%3E$0$0=%3E$0$1=%3E$1=%3E$1(_)(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$1$1=%3Econcat(_)(_=%3E(quicksort(_)(_=%3E$1$0(_))))(_=%3E(Cons(_)(_=%3E$0(_))(_=%3E(quicksort(_)(_=%3E$1$1(_)))))))))(_=%3Equicksort=%3E$D1(_)(_=%3Ev0=%3EZ(_))(_=%3Ev0=%3E$D1(_)(_=%3Ev1=%3ES(_)(_=%3Ev0(_)))(_=%3Ev1=%3E$D1(_)(_=%3Ev2=%3ES(_)(_=%3Ev1(_)))(_=%3Ev2=%3E$D1(_)(_=%3Ev3=%3ES(_)(_=%3Ev2(_)))(_=%3Ev3=%3E$D1(_)(_=%3Ev4=%3ES(_)(_=%3Ev3(_)))(_=%3Ev4=%3E$D1(_)(_=%3Elist=%3ECons(_)(_=%3Ev3(_))(_=%3E(Cons(_)(_=%3Ev4(_))(_=%3E(Cons(_)(_=%3Ev1(_))(_=%3E(Cons(_)(_=%3Ev0(_))(_=%3ENill(_)))))))))(_=%3Elist=%3Equicksort(_)(_=%3Elist(_))))))))))))))))))))))(_=%3E$0=%3Ec=%3E(f=%3Ec(_)(f))(_=%3E$Y(_)($0))))(_=%3E$0=%3Ec=%3Ec(_)($0)))(_=%3Ef=%3E(x=%3Ef(_)(_=%3Ex(x)))(x=%3Ef(_)(_=%3Ex(x))))) by entering `exec`. 
 
 ```
 // Natural number constructors, peano numbers (Zero and Successor) and functions
@@ -153,7 +209,4 @@ This convention is also the reason that applying arguments in JS to the compiled
 While usually we would write `console.log(decode(v))`, if `v` takes an argument, we have to write `console.log(decode(_=>v(_)(encode(arg))))`. This is because we have to pass our value lazily to `decode`, so we have to pass a getter function, and we have to first obtain the function `v` from the lazy getter, by applying it to our dummy variable `_`. Only then we can supply our argument to this, which we can create using a string and the encode function, E.g. `console.log(decode(_=>v(_)(encode("(S (S Z))"))))`.  
 
 ### Compilation process
-This repository contains rascal code for compiling ljs code to lambda expressions in JS. The rascal code has however not been turned into any proper compiler or IDE tools yet, everything but a proper interface is present.
-Currently the function `testProgram` in `main.rsc` is the main entry point, which takes the code written in `testSyntax` and outputs the compiled code in the terminal. 
-
-I may or may not get back to this and create a proper interface to allow people to use this language. Of course there's no practical reason to use this language, but it may still be nice to complete this project.
+This repository contains rascal code for compiling ljs code to lambda expressions in JS. See [VSCode integration](#VSCode-integration).

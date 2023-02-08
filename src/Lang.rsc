@@ -5,7 +5,9 @@ lexical WhitespaceAndComment
     = [\t-\n\r\ ]
     | @category="comment" "//" ![\n]* $;
     
-lexical Identifier = ([a-zA-Z][a-zA-Z0-9]*) \ "output" !>> [a-zA-Z0-9];
+// lexical Identifier = [a-zA-Z0-9@$_\[\](){}\<\>&|+\-*/\\!%^#?,.:;\'\"]+ \ "output" !>> [a-zA-Z0-9@$_\[\](){}\<\>&|+\-*/\\!%^#?,.:;\'\"];
+
+lexical Identifier = [a-zA-Z0-9@$_\[\]{}\<\>&|+\-*/\\!%^#?,.:\'\"]+ \ "output" !>> [a-zA-Z0-9@$_\[\]{}\<\>&|+\-*/\\!%^#?,.:\'\"];
 
 start syntax Program = Statement*;
 

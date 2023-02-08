@@ -1,8 +1,0 @@
-Leaf val;
-Tree left right;
-
-doPoop d (Tree x y) = orange x;
-doPoop (Tree x z) = orange x;
-orange k = Tree k k;
-
-output orange;

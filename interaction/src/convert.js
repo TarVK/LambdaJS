@@ -13,9 +13,10 @@ const createConverters = (constructors, funcName, func)=>{
     const lookup = Object.fromEntries(constructors.map(([name, paramCount], i)=>
         [name, [paramCount, createConstructor(i, paramCount, constructors.length)]]));
     lookup[funcName] = [-1, func];
+    console.log(lookup);
 
     const encode = val=>{
-        const tokens = [...val.split(/\s*(?:\b|(?=[)(]))\s*/), null];
+        const tokens = [...val.split(/\s*(?:(?=[)(])|(?<=[)(])|\s+)\s*/), null];
         let i = 0;
         const peek = val=>tokens[i]==val;
         const consume = ()=>tokens[i++];

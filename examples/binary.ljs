@@ -1,0 +1,38 @@
+False;
+True;
+
+// Binary number constructors, in right-to-left (RtL) notation E.g. (0 (0 (1 _))) = 4, instead of 1
+0 n;
+1 n;
+_;
+
+// Lets define a function to switch between LtR and RtL notation
+<> x = r<> x _;
+r<> _ acc = acc;
+r<> (0 x) acc = r<> x (0 acc);
+r<> (1 x) acc = r<> x (1 acc);
+
+// Define an add function inductively on RtL notation (3 * 3 * 2 definitions + initial def, with a few cases combined)
++ a b = +r a b False;
++r _     _     False = _;
++r _     _     True  = 1 _;
++r a     _     False = a;
++r (0 a) _     True  = 1 (+r a _ False);
++r (1 a) _     True  = 0 (+r a _ True);
++r _     b     False = b;
++r _     (0 b) True  = 1 (+r _ b False);
++r _     (1 b) True  = 0 (+r _ b True);
++r (0 a) (0 b) False = 0 (+r a b False);
++r (0 a) (0 b) True  = 1 (+r a b False);
++r (1 a) (0 b) False = 1 (+r a b False);
++r (1 a) (0 b) True  = 0 (+r a b True);
++r (0 a) (1 b) False = 1 (+r a b False);
++r (0 a) (1 b) True  = 0 (+r a b True);
++r (1 a) (1 b) False = 0 (+r a b True);
++r (1 a) (1 b) True  = 1 (+r a b True);
+
+// Output a LtR definition of addition
+s+ a b = <> (+ (<> a) (<> b));
+output s+;
+
+// Compiled code link: https://tarvk.github.io/LambdaJS/interaction/?constructors=[[%22_%22,0],[%22False%22,0],[%22True%22,0],[%22Undefined%22,0],[%220%22,1],[%221%22,1]]&func=_=%3E($Y=%3E($D0=%3E($D1=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$0(_))(_=%3E__=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$1(_))(_=%3EFalse=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$2(_))(_=%3ETrue=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$3(_))(_=%3EUndefined=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$5(_)($0))(_=%3E_0=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$6=%3E$6(_)($0))(_=%3E_1=%3E$D1(_)(_=%3Er_LT_GT=%3E$0=%3E$0(_)(_=%3E$1=%3E$1(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$0$0=%3E$1=%3Er_LT_GT(_)(_=%3E$0$0(_))(_=%3E(_0(_)(_=%3E$1(_)))))(_=%3E$0$0=%3E$1=%3Er_LT_GT(_)(_=%3E$0$0(_))(_=%3E(_1(_)(_=%3E$1(_))))))(_=%3Er_LT_GT=%3E$D1(_)(_=%3E_LT_GT=%3E$0=%3Er_LT_GT(_)(_=%3E$0(_))(_=%3E__(_)))(_=%3E_LT_GT=%3E$D1(_)(_=%3E_PLUSr=%3E$0=%3E$0(_)(_=%3E$1=%3E$1(_)(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E__(_))(_=%3E_1(_)(_=%3E__(_)))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$1(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$1(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$1(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3E$1$0=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$1(_))(_=%3E_1(_)(_=%3E(_PLUSr(_)(_=%3E__(_))(_=%3E$1$0(_))(_=%3EFalse(_)))))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3E$1$0=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$1(_))(_=%3E_0(_)(_=%3E(_PLUSr(_)(_=%3E__(_))(_=%3E$1$0(_))(_=%3ETrue(_)))))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))))(_=%3E$1=%3E$1(_)(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$0(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_)))(_=%3E$1=%3E$1(_)(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$0(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_)))(_=%3E$1=%3E$1(_)(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$0(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_))(_=%3E$1$0=%3EUndefined(_)))(_=%3E$0$0=%3E$1=%3E$1(_)(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$0(_))(_=%3E_1(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E__(_))(_=%3EFalse(_)))))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E_0(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E$1$0(_))(_=%3EFalse(_)))))(_=%3E_1(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E$1$0(_))(_=%3EFalse(_)))))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3E$1$0=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E_1(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E$1$0(_))(_=%3EFalse(_)))))(_=%3E_0(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E$1$0(_))(_=%3ETrue(_)))))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))))(_=%3E$0$0=%3E$1=%3E$1(_)(_=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E$0(_))(_=%3E_0(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E__(_))(_=%3ETrue(_)))))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3E$1$0=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E_1(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E$1$0(_))(_=%3EFalse(_)))))(_=%3E_0(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E$1$0(_))(_=%3ETrue(_)))))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))(_=%3E$1$0=%3E$2=%3E$2(_)(_=%3EUndefined(_))(_=%3E_0(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E$1$0(_))(_=%3ETrue(_)))))(_=%3E_1(_)(_=%3E(_PLUSr(_)(_=%3E$0$0(_))(_=%3E$1$0(_))(_=%3ETrue(_)))))(_=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_))(_=%3E$2$0=%3EUndefined(_)))))(_=%3E_PLUSr=%3E$D1(_)(_=%3E_PLUS=%3E$0=%3E$1=%3E_PLUSr(_)(_=%3E$0(_))(_=%3E$1(_))(_=%3EFalse(_)))(_=%3E_PLUS=%3E$D1(_)(_=%3Es_PLUS=%3E$0=%3E$1=%3E_LT_GT(_)(_=%3E(_PLUS(_)(_=%3E(_LT_GT(_)(_=%3E$0(_))))(_=%3E(_LT_GT(_)(_=%3E$1(_)))))))(_=%3Es_PLUS=%3Es_PLUS(_)))))))))))))(_=%3E$0=%3Ec=%3E(f=%3Ec(_)(f))(_=%3E$Y(_)($0))))(_=%3E$0=%3Ec=%3Ec(_)($0)))(_=%3Ef=%3E(x=%3Ef(_)(_=%3Ex(x)))(x=%3Ef(_)(_=%3Ex(x))))

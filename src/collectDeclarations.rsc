@@ -15,7 +15,7 @@ public WithErrors[Declarations] collectDeclarations(start[Program] program) {
     
     visit (program) {
         case (Declaration)`<Constructor const>`: {
-            if ((Constructor)`<ConstructorName nameC> <Identifier* parts>;` := const){
+            if ((Constructor)`<ConstructorName nameC><Identifier* parts>;` := const){
                 list[Identifier] partsList = [p | Identifier p <- parts];
                 str name = "<nameC>";
                 

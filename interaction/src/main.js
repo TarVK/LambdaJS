@@ -1,8 +1,13 @@
 
 
 const setupFromURL = ()=>{
-    const params = new URLSearchParams(location.search);
-    setup(JSON.parse(params.get("constructors")), params.get("func"));
+    const paramsList = location.search.substring(1).split("&");
+    const paramsRelation = paramsList.map(p=>{
+        const parts = p.split("=");
+        return [parts[0], decodeURI(parts.slice(1).join("="))];
+    });
+    const paramsMap = Object.fromEntries(paramsRelation);
+    setup(JSON.parse(paramsMap["constructors"]), paramsMap["func"]);
 };
 
 function setup(constructors, code){

@@ -1,13 +1,15 @@
-Z;
-S nat;
+0;
+1+ nat;
 
 False;
 True;
 
-neg True = False;
-neg False = True;
+! True = False;
+! False = True;
 
-isOdd Z = False;
-isOdd (S x) = neg (isOdd x);
+isOdd 0 = False;
+isOdd (1+ x) = !(isOdd x);
 
-output isOdd (S (S (S Z)));
+output isOdd;
+
+// Compiled code link: https://tarvk.github.io/LambdaJS/interaction/?constructors=[[%22False%22,0],[%221+%22,1],[%22True%22,0],[%22Undefined%22,0],[%220%22,0]]&func=_=%3E($Y=%3E($D0=%3E($D1=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$0(_))(_=%3EFalse=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$5=%3E$2(_)($0))(_=%3E_1_PLUS=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$2(_))(_=%3ETrue=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$3(_))(_=%3EUndefined=%3E$D0(_)(_=%3E$0=%3E$1=%3E$2=%3E$3=%3E$4=%3E$4(_))(_=%3E_0=%3E$D1(_)(_=%3E_EXC=%3E$0=%3E$0(_)(_=%3ETrue(_))(_=%3E$0$0=%3EUndefined(_))(_=%3EFalse(_))(_=%3EUndefined(_))(_=%3EUndefined(_)))(_=%3E_EXC=%3E$D1(_)(_=%3EisOdd=%3E$0=%3E$0(_)(_=%3EUndefined(_))(_=%3E$0$0=%3E_EXC(_)(_=%3E(isOdd(_)(_=%3E$0$0(_)))))(_=%3EUndefined(_))(_=%3EUndefined(_))(_=%3EFalse(_)))(_=%3EisOdd=%3EisOdd(_)))))))))(_=%3E$0=%3Ec=%3E(f=%3Ec(_)(f))(_=%3E$Y(_)($0))))(_=%3E$0=%3Ec=%3Ec(_)($0)))(_=%3Ef=%3E(x=%3Ef(_)(_=%3Ex(x)))(x=%3Ef(_)(_=%3Ex(x))))

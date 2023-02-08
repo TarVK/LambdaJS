@@ -23,12 +23,16 @@ public set[Identifier] dependencies(
     set[str] constructors, 
     bool includePattern
 ) {
-    set[Identifier] references = dependencies(body);
-    if(includePattern) references += dependencies(structure);
-    set[str] params = parameters(structure, constructors);
-    return {r | r <- references, !("<r>" in params)};
+    if((Structure)`<Identifier name><SimpleStructure* paramStructures>` := structure) {
+        set[Identifier] references = dependencies(body);
+        if(includePattern) references += dependencies(structure);
+        set[str] params = parameters([s | s <- paramStructures], constructors);
+        return {r | r <- references, !("<r>" in params)};
+    }
+    return {};
 }
 
+// Note, this does not correctly retrieve all simple structure constructor dependencies
 public set[Identifier] dependencies((Expression)`<SimpleExpression+ ss>`)
     = dependencies([s | s <- ss]);
 public set[Identifier] dependencies([(SimpleExpression)`<Identifier id>`, *rest]) 
@@ -115,7 +119,7 @@ list[set[str]] getSCC(StringDependencies dependencies) {
 
 // Create an order with recursion data
 public Errors getUnknownFunctions(Dependencies dependencies, set[str] funcs)
-    = ({} | it + getUnknownFunctions(dependencies[name], funcs) | name <- dependencies);
+    = {*getUnknownFunctions(dependencies[name], funcs) | name <- dependencies};
 public Errors getUnknownFunctions({Identifier dependency, *rest}, set[str] funcs) {
     if ("<dependency>" in funcs) return getUnknownFunctions(rest, funcs);
     else return UnknownIdentifier(dependency) + getUnknownFunctions(rest, funcs);   
@@ -138,4 +142,9 @@ public WithErrors[FunctionOrder] orderDeclarations(map[str, list[Function]] func
         [FG(size(component) > 1 || (v in sd[v]), component) | component <- components, v := getOneFrom(component)],
         getUnknownFunctions(dependencies(functions, constNames, false), {f | f <- functions} + constNames)
     >;
+}
+
+public Errors getUnknownInExpression(Expression exp, map[str, list[Function]] functions,  map[str, Const] constructors) {
+    set[str] constNames = {c | c <- constructors};
+    return getUnknownFunctions(dependencies(exp), {f | f <- functions} + constNames);
 }

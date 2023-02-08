@@ -8,6 +8,7 @@ import orderDeclarations;
 import compileFunction;
 import compileConstructor;
 import lambdaHelpers;
+import jsEscape;
 
 import util::LanguageServer;
 import util::IDEServices;
@@ -16,7 +17,6 @@ import util::Reflective;
 import util::Maybe;
 import IO;
 import Set;
-import String;
 import getSourceInfo;
 
 // a minimal implementation of a DSL in rascal
@@ -30,12 +30,6 @@ set[LanguageService] lambdaJSContributions() = {
     lenses(lambdaJSLenseDetector)
 };
 
-// list[InlayHint] lambdaJSHinter(start[Program] input) {
-//     return [
-//         hint(input.src, "yoooo", \type(), atEnd = true)
-//     ];
-// }
-
 // We allow users to evaluate the code from the output statement
 value lambdaJSExecutor(Command command) {
     if(execute(input) := command && just(<code, constructors>) := compileLambdaJS(input)) {
@@ -46,20 +40,12 @@ value lambdaJSExecutor(Command command) {
     return 0;
 }
 
-str urlEncode(str text) = replace(text, (
-    "[": "%5B",
-    "]": "%5D",
-    "\"": "%22",
-    ",": "%2C",
-    "\>": "%3E"
-));
-str replace(str text, map[str, str] replace) = joinList([char in replace ? replace[char] : char | char <- split("", text)]);
-str joinList(list[str] text) = reducer(text, j, "");
-str j(str a, str b) = a + b;
-
 public Maybe[tuple[str, str]] compileLambdaJS(start[Program] input) {
+    start[Program] escapedInput = jsEscape(input);
+
     // In this compilation, the errors are ignored
-    if(<Declarations(constructors, functionDeclarations, optOutput), declarationErrors> := collectDeclarations(input) 
+    if(<Declarations(constructors, functionDeclarations, optOutput), declarationErrors> := collectDeclarations(escapedInput) 
+        && <Declarations(orConstructors, _, _), _> := collectDeclarations(input) 
         && <order, unknownErrors> := orderDeclarations(functionDeclarations, constructors)) {
         list[Const] constructorList = [constructors[s] | s <- constructors];
 
@@ -87,7 +73,8 @@ public Maybe[tuple[str, str]] compileLambdaJS(start[Program] input) {
         str body = combineDefinitions(constructorDefinitions + orderedFunctionDefinitions, output);
         str out = wrapHelpers(body, definerSizes);
 
-        str constrString = toString([[name, paramCount] | Const(name, paramCount, _) <- constructorList]);
+        map[str, str] orConstructorNames = ("<jsEscape("<orConstrName>")>": "<orConstrName>" | orConstrName <- orConstructors);
+        str constrString = toString([[orConstructorNames[name], paramCount] | Const(name, paramCount, _) <- constructorList]);
 
         return just(<out, constrString>);
     }
@@ -134,7 +121,8 @@ Summary lambdaJSSummarizer(loc l, start[Program] input) {
             funcName <- functionMatches, 
             matchLists := [<ml, (), false> | ML(ml) <- functionMatches[funcName]], 
             <split, patternErrors> := createMatchTree(constructorList, matchLists)};
-        Errors unknownErrors = orderDeclarations(functionDeclarations, constructors)<1>;
+        Errors unknownErrors = orderDeclarations(functionDeclarations, constructors)<1>
+            + {*getUnknownInExpression(exp, functionDeclarations, constructors ) | /(Output)`output <Expression exp> ;` := input};
 
         Errors allErrors = matchListErrors + matchErrors + declarationErrors + unknownErrors;
 
@@ -194,4 +182,10 @@ int main() {
         )
     );
     return 0;
+}
+
+void testCompile() {
+    start[Program] program = parse(#start[Program], readFile(|file:///I:/projects/Github/LambdaJS/examples/odd.ljs|));
+    print(jsEscape(program));
+    // compileLambdaJS(program);
 }

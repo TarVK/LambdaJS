@@ -84,7 +84,7 @@ In order to use the VSCode integration, several steps are required:
 - Open a rascal terminal (`ctrl-shift-p` > `create rascal terminal`)
 - Enter: 
     ```
-    import LanguageServer
+    import LanguageServer;
     main();
     ```
 - Open any `.ljs` file in this VSCode session, and get ljs support.

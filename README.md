@@ -33,11 +33,11 @@ Z;
 not True = False;
 not False = True;
 
-isEven Z = True;
-isEven (S x) = not (isEven x);
+isOdd Z = False;
+isOdd (S x) = not (isOdd x);
 ```
 
-This code specifies that our base case 0, is even. Any number `y` that's bigger than 0 is defined as the successor of another number `x`, I.e. `y = x+1`. Hence if `y` is even, `x` must be odd, and vice-versa. Hence our second declaration for `isEven` specifies that a value `y` that's the successor of `x` is the negation of `isEven x`. And since `x` is smaller than `y`, this will simply recurse until the base case of 0 is eventually reached. 
+This code specifies that our base case 0, is not odd. Any number `y` that's bigger than 0 is defined as the successor of another number `x`, I.e. `y = x+1`. Hence if `y` is odd, `x` must be even, and vice-versa. Hence our second declaration for `isOdd` specifies that a value `y` that's the successor of `x` is the negation of `isOdd x`. And since `x` is smaller than `y`, this will simply recurse until the base case of 0 is eventually reached. 
 
 Finally, we can use the keyword `output` followed by an expression in order to specify what the code should output when compiled.
 
